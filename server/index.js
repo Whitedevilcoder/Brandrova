@@ -7,10 +7,17 @@ const nodemailer = require('nodemailer');
 const app = express();
 
 // Middleware
-app.use(express.json()); // Parses incoming JSON data
-app.use(cors()); // Allows cross-origin requests from our React app
+// We allow localhost for testing, and we will allow any origin for now to prevent CORS errors during deployment. 
+// Later, you can lock this down to just your Vercel URL!
+app.use(cors({ origin: '*' })); 
+app.use(express.json());
 
-// The Contact Form Route
+// --- Simple Health Check Route (Good for Render) ---
+app.get('/', (req, res) => {
+  res.status(200).send('🚀 Brandrova API is up and running!');
+});
+
+// --- THE CONTACT FORM ROUTE ---
 app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body;
 
@@ -20,8 +27,6 @@ app.post('/api/contact', async (req, res) => {
   }
 
   try {
-    // NOTE: To make this work in production, you'll need to configure your email provider.
-    // For Gmail, you need to generate an "App Password" in your Google Account settings.
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -44,7 +49,7 @@ app.post('/api/contact', async (req, res) => {
     };
 
     // Send the email
-    // await transporter.sendMail(mailOptions); // Uncomment this when you add real credentials to .env
+    await transporter.sendMail(mailOptions);
 
     console.log('Received Lead:', { name, email, message });
     
@@ -60,5 +65,5 @@ app.post('/api/contact', async (req, res) => {
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Brandrova Backend running on http://localhost:${PORT}`);
+  console.log(`🚀 Brandrova Backend running on port ${PORT}`);
 });
