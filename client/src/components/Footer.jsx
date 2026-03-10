@@ -14,7 +14,7 @@ const Footer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setStatus({ type: '', msg: '' });
+    setStatus({ type: '', msg: '' }); // Clear previous messages immediately on new submit
 
     try {
       const response = await fetch('http://localhost:5000/api/contact', {
@@ -35,6 +35,11 @@ const Footer = () => {
       setStatus({ type: 'error', msg: 'Server error. Please ensure the backend is running.' });
     } finally {
       setIsSubmitting(false);
+      
+      // Auto-hide the status message after 5 seconds (5000 milliseconds)
+      setTimeout(() => {
+        setStatus({ type: '', msg: '' });
+      }, 5000);
     }
   };
 
@@ -82,10 +87,11 @@ const Footer = () => {
           <div className="bg-gray-50 dark:bg-gray-800/50 p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-gray-700">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Send Us a Message</h3>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Dynamic Status Message */}
+            <form onSubmit={handleSubmit} className="space-y-4 relative">
+              
+              {/* Dynamic Status Message with Fade-in effect */}
               {status.msg && (
-                <div className={`p-4 rounded-lg text-sm font-semibold transition-all ${status.type === 'success' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800'}`}>
+                <div className={`p-4 rounded-lg text-sm font-semibold transition-all duration-300 animate-fade-in ${status.type === 'success' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800'}`}>
                   {status.msg}
                 </div>
               )}
