@@ -1,8 +1,43 @@
 // src/components/Footer.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 
 const Footer = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState({ type: '', msg: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatus({ type: '', msg: '' });
+
+    try {
+      const response = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus({ type: 'success', msg: data.success || 'Message sent successfully!' });
+        setFormData({ name: '', email: '', message: '' }); // Clear the form on success
+      } else {
+        setStatus({ type: 'error', msg: data.error || 'Something went wrong.' });
+      }
+    } catch (error) {
+      setStatus({ type: 'error', msg: 'Server error. Please ensure the backend is running.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <footer className="bg-white dark:bg-brand-dark border-t border-gray-200 dark:border-gray-800 pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,26 +78,60 @@ const Footer = () => {
             </a>
           </div>
 
-          {/* Right Side: Contact Form Placeholder */}
+          {/* Right Side: Active Contact Form */}
           <div className="bg-gray-50 dark:bg-gray-800/50 p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-gray-700">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Send Us a Message</h3>
             
-            {/* Form prevents default submission so it doesn't refresh the page before you build your backend */}
-            <form onSubmit={(e) => { e.preventDefault(); alert('Backend integration pending!'); }} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Dynamic Status Message */}
+              {status.msg && (
+                <div className={`p-4 rounded-lg text-sm font-semibold transition-all ${status.type === 'success' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800'}`}>
+                  {status.msg}
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Name</label>
-                <input type="text" placeholder="Your Name" className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all outline-none" required />
+                <input 
+                  type="text" 
+                  name="name" 
+                  value={formData.name} 
+                  onChange={handleChange} 
+                  placeholder="Your Name" 
+                  className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all outline-none" 
+                  required 
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-                <input type="email" placeholder="you@example.com" className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all outline-none" required />
+                <input 
+                  type="email" 
+                  name="email" 
+                  value={formData.email} 
+                  onChange={handleChange} 
+                  placeholder="you@example.com" 
+                  className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all outline-none" 
+                  required 
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">How can we help?</label>
-                <textarea rows="4" placeholder="Tell us about your business goals..." className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all outline-none resize-none" required></textarea>
+                <textarea 
+                  name="message" 
+                  value={formData.message} 
+                  onChange={handleChange} 
+                  rows="4" 
+                  placeholder="Tell us about your business goals..." 
+                  className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all outline-none resize-none" 
+                  required
+                ></textarea>
               </div>
-              <button type="submit" className="w-full bg-brand-primary hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors shadow-md">
-                Send Message
+              <button 
+                type="submit" 
+                disabled={isSubmitting} 
+                className="w-full bg-brand-primary hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+              >
+                {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
             </form>
           </div>
