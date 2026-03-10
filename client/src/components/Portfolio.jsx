@@ -1,5 +1,6 @@
 // src/components/Portfolio.jsx
 import React from 'react';
+import { motion } from 'framer-motion';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 
 const Portfolio = () => {
@@ -7,61 +8,82 @@ const Portfolio = () => {
     {
       title: 'Bhilai Bakery Demo',
       category: 'Local Shop / E-commerce',
-      description: 'A warm, inviting layout perfect for local bakeries, cafes, and sweet shops. Features a dynamic menu and direct WhatsApp ordering.',
-      imageColor: 'from-orange-400 to-red-500', // Placeholder gradient since we don't have images yet
+      description: 'A warm, inviting layout perfect for local bakeries, cafes, and sweet shops. Features dynamic menus and direct WhatsApp ordering.',
+      image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     },
     {
       title: 'City Clinic Demo',
       category: 'Healthcare / Services',
       description: 'A highly professional, clean design for clinics and hospitals. Includes appointment booking forms and Google Maps integration.',
-      imageColor: 'from-blue-400 to-cyan-500',
+      image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     },
     {
       title: 'Industrial Logistics',
       category: 'Manufacturing / B2B',
       description: 'A robust, heavy-duty architecture designed to showcase machinery, fleet capabilities, and secure client portals.',
-      imageColor: 'from-gray-600 to-slate-800',
+      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     }
   ];
 
   return (
-    <section id="portfolio" className="py-20 relative">
+    <section id="portfolio" className="py-24 relative bg-white dark:bg-brand-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Don't Just Take Our Word For It.
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            Explore our premium demo sites tailored for your industry.
+            Explore our premium demo layouts tailored specifically for your industry.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {demos.map((demo, index) => (
-            <div key={index} className="group rounded-2xl overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+            <motion.div 
+              key={index}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.2 }}
+              className="group rounded-2xl overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-2xl transition-all duration-500"
+            >
               
-              {/* Image Placeholder using Gradients */}
-              <div className={`h-48 w-full bg-gradient-to-br ${demo.imageColor} relative overflow-hidden flex items-center justify-center`}>
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
-                <span className="text-white font-bold tracking-wider uppercase text-sm opacity-80">Premium Layout</span>
+              {/* Real Image with Hover Zoom */}
+              <div className="h-56 w-full relative overflow-hidden">
+                <img 
+                  src={demo.image} 
+                  alt={demo.title} 
+                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                  <span className="text-white font-bold tracking-wider uppercase text-sm border border-white/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                    View Project
+                  </span>
+                </div>
               </div>
               
-              <div className="p-6">
+              <div className="p-8 relative bg-white dark:bg-gray-800 transform transition-transform duration-500">
                 <span className="text-xs font-bold text-brand-primary uppercase tracking-wider mb-2 block">
                   {demo.category}
                 </span>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                   {demo.title}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm line-clamp-3">
                   {demo.description}
                 </p>
                 
-                <button className="flex items-center gap-2 text-brand-primary font-semibold hover:text-blue-700 dark:hover:text-blue-400 transition-colors">
-                  View Live Demo <FaExternalLinkAlt className="text-xs" />
+                <button className="flex items-center gap-2 text-brand-primary font-semibold hover:text-blue-700 dark:hover:text-blue-400 transition-colors group-hover:gap-3">
+                  Launch Demo <FaExternalLinkAlt className="text-xs" />
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
