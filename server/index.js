@@ -7,21 +7,24 @@ const nodemailer = require('nodemailer');
 const app = express();
 
 // Middleware
-// We allow localhost for testing, and we will allow any origin for now to prevent CORS errors during deployment. 
-// Later, you can lock this down to just your Vercel URL!
 app.use(cors({ origin: '*' })); 
 app.use(express.json());
 
-// --- Simple Health Check Route (Good for Render) ---
+// --- 1. Health Check Route (General Status) ---
 app.get('/', (req, res) => {
   res.status(200).send('🚀 Brandrova API is up and running!');
 });
 
-// --- THE CONTACT FORM ROUTE ---
+// --- 2. CRON JOB PING ROUTE (Keeps Render Awake) ---
+app.get('/api/ping', (req, res) => {
+  console.log('⏰ Cron ping received. Keeping server awake...');
+  res.status(200).json({ status: 'awake', time: new Date().toISOString() });
+});
+
+// --- 3. THE CONTACT FORM ROUTE ---
 app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body;
 
-  // Basic validation
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Please fill out all fields.' });
   }
@@ -37,7 +40,7 @@ app.post('/api/contact', async (req, res) => {
 
     const mailOptions = {
       from: email,
-      to: process.env.EMAIL_USER, // Sends the lead to your own inbox
+      to: process.env.EMAIL_USER, 
       subject: `New Agency Lead: ${name}`,
       text: `
         You have a new lead from the Brandrova website!
@@ -48,12 +51,8 @@ app.post('/api/contact', async (req, res) => {
       `,
     };
 
-    // Send the email
     await transporter.sendMail(mailOptions);
-
     console.log('Received Lead:', { name, email, message });
-    
-    // Send success response back to React
     res.status(200).json({ success: 'Message sent successfully! We will contact you soon.' });
 
   } catch (error) {
