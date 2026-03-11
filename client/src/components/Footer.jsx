@@ -14,31 +14,39 @@ const Footer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setStatus({ type: '', msg: '' }); // Clear previous messages immediately on new submit
+    setStatus({ type: '', msg: '' });
 
     try {
-      // Update this fetch URL!
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${API_URL}/api/contact`, {
+      // SENIOR PIVOT: Vercel Frontend talks directly to Web3Forms! 
+      // This bypasses the Render server entirely and guarantees delivery.
+      const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: '67da3c99-aa78-49f4-96f9-738877494c27',   
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          subject: `🔥 New Agency Lead from ${formData.name}`,
+          from_name: 'Brandrova Website'
+        })
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        setStatus({ type: 'success', msg: data.success || 'Message sent successfully!' });
-        setFormData({ name: '', email: '', message: '' }); // Clear the form on success
+      if (data.success) {
+        setStatus({ type: 'success', msg: 'Message sent successfully! We will contact you soon.' });
+        setFormData({ name: '', email: '', message: '' }); 
       } else {
-        setStatus({ type: 'error', msg: data.error || 'Something went wrong.' });
+        setStatus({ type: 'error', msg: data.message || 'Something went wrong.' });
       }
     } catch (error) {
-      setStatus({ type: 'error', msg: 'Server error. Please ensure the backend is running.' });
+      setStatus({ type: 'error', msg: 'Network error. Please try again.' });
     } finally {
       setIsSubmitting(false);
-      
-      // Auto-hide the status message after 5 seconds (5000 milliseconds)
       setTimeout(() => {
         setStatus({ type: '', msg: '' });
       }, 5000);
