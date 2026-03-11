@@ -22,45 +22,55 @@ app.get('/api/ping', (req, res) => {
 });
 
 // --- 3. THE CONTACT FORM ROUTE ---
-app.post('/api/contact', async (req, res) => {
-    const { name, email, message } = req.body;
+// --- THE CONTACT FORM ROUTE (SENIOR ARCHITECTURE) ---
+app.post('/api/contact', (req, res) => {
+  const { name, email, message } = req.body;
 
-    if (!name || !email || !message) {
-        return res.status(400).json({ error: 'Please fill out all fields.' });
-    }
+  // 1. Instant Validation
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'Please fill out all fields.' });
+  }
 
-    try {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // true for 465, forces standard SSL connection
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
+  // 2. Setup the Transport with the Port 587 Bypass
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587, // Switched from 465 to 587
+    secure: false, // Must be false for 587
+    requireTLS: true, // Forces secure connection after bypassing the firewall
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+    connectionTimeout: 10000, // Kills the connection if it hangs longer than 10s
+  });
 
-        const mailOptions = {
-            from: email,
-            to: process.env.EMAIL_USER,
-            subject: `New Agency Lead: ${name}`,
-            text: `
-        You have a new lead from the Brandrova website!
-        
-        Name: ${name}
-        Email: ${email}
-        Message: ${message}
-      `,
-        };
+  const mailOptions = {
+    from: email,
+    to: process.env.EMAIL_USER,
+    subject: `New Agency Lead: ${name}`,
+    text: `
+      You have a new lead from the Brandrova website!
+      
+      Name: ${name}
+      Email: ${email}
+      Message: ${message}
+    `,
+  };
 
-        await transporter.sendMail(mailOptions);
-        console.log('Received Lead:', { name, email, message });
-        res.status(200).json({ success: 'Message sent successfully! We will contact you soon.' });
+  // 3. THE "FIRE AND FORGET" ALGORITHM
+  // Notice there is NO 'await' here. We execute this in the background.
+  transporter.sendMail(mailOptions)
+    .then(() => {
+      console.log(`✅ Background email successfully sent for lead: ${name}`);
+    })
+    .catch((error) => {
+      console.error('❌ Background email failed:', error);
+      // Even if this fails in the background, the user doesn't get stuck staring at a loading screen.
+    });
 
-    } catch (error) {
-        console.error('Email error:', error);
-        res.status(500).json({ error: 'Failed to send message. Please try again later.' });
-    }
+  // 4. INSTANT RESPONSE TO FRONTEND
+  // We send the success message back to React immediately. The UI updates instantly.
+  return res.status(200).json({ success: 'Message sent! We will contact you soon.' });
 });
 
 // Start the server
