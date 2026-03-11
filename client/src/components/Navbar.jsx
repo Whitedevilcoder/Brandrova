@@ -29,6 +29,7 @@ const Navbar = () => {
             <a href="#services" className="text-gray-600 hover:text-brand-primary dark:text-gray-300 dark:hover:text-white font-medium transition-colors">Services</a>
             <a href="#portfolio" className="text-gray-600 hover:text-brand-primary dark:text-gray-300 dark:hover:text-white font-medium transition-colors">Portfolio</a>
             <a href="#pricing" className="text-gray-600 hover:text-brand-primary dark:text-gray-300 dark:hover:text-white font-medium transition-colors">Pricing</a>
+            <a href="#contact" className="text-gray-600 hover:text-brand-primary dark:text-gray-300 dark:hover:text-white font-medium transition-colors">Contact</a>
             
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
@@ -57,6 +58,7 @@ const Navbar = () => {
         <a href="#services" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-gray-600 dark:text-gray-300 font-medium hover:text-brand-primary">Services</a>
         <a href="#portfolio" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-gray-600 dark:text-gray-300 font-medium hover:text-brand-primary">Portfolio</a>
         <a href="#pricing" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-gray-600 dark:text-gray-300 font-medium hover:text-brand-primary">Pricing</a>
+        <a href="#contact" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-gray-600 dark:text-gray-300 font-medium hover:text-brand-primary">Contact</a>
       </div>
     </nav>
   );

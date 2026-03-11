@@ -54,7 +54,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-white dark:bg-brand-dark border-t border-gray-200 dark:border-gray-800 pt-20 pb-10">
+    <footer id = "contact" className="bg-white dark:bg-brand-dark border-t border-gray-200 dark:border-gray-800 pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="grid md:grid-cols-2 gap-16 mb-16">
